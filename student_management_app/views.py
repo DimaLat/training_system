@@ -99,6 +99,9 @@ def Testurl(request):
 
     return HttpResponse("Ok", {"courses":courses})
 
+def Contacts(request):
+
+    return render(request,'contacts.html')
 
 def signup_admin(request):
     return render(request, "signup_admin_page.html")
