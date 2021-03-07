@@ -123,8 +123,9 @@ urlpatterns = [
     path('node_modules/canvas-designer/widget.html',StaffViews.returnHtmlWidget,name="returnHtmlWidget"),
 
     path('contacts/', views.Contacts),
+
+    #API
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    # path('courses/', views.courses_list),
     path('courses/<int:pk>/', views.CoursesDetail.as_view()),
     path('subjects/<int:pk>/', views.SubjectsDetail.as_view()),
     path('staffs/<int:pk>/', views.StaffsDetail.as_view())

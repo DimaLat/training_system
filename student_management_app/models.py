@@ -66,7 +66,7 @@ class Students(models.Model):
     course_id = models.ForeignKey(Courses, on_delete=models.DO_NOTHING)
     session_year_id = models.ForeignKey(SessionYearModel, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.    DateTimeField(auto_now_add=True)
     fcm_token = models.TextField(default="")
     objects = models.Manager()
 
