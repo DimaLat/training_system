@@ -15,13 +15,12 @@ Including another URLconf
 """
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path, include
-from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import TemplateView
 
 from student_management_app import views, HodViews, StaffViews, StudentViews
 from student_management_app.EditResultVIewClass import EditResultViewClass
 from student_management_system import settings
+from django.urls import include, path
+
 
 urlpatterns = [
     path('demo',views.showDemoPage),
@@ -122,6 +121,13 @@ urlpatterns = [
     path('student_view_result',StudentViews.student_view_result,name="student_view_result"),
     path('join_class_room/<int:subject_id>/<int:session_year_id>',StudentViews.join_class_room,name="join_class_room"),
     path('node_modules/canvas-designer/widget.html',StaffViews.returnHtmlWidget,name="returnHtmlWidget"),
-    path('testurl/',views.Testurl),
-    path('contacts/', views.Contacts)
+
+    path('contacts/', views.Contacts),
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    # path('courses/', views.courses_list),
+    path('courses/<int:pk>/', views.CoursesDetail.as_view()),
+    path('subjects/<int:pk>/', views.SubjectsDetail.as_view()),
+    path('staffs/<int:pk>/', views.StaffsDetail.as_view())
+
+
 ]+static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)+static(settings.STATIC_URL,document_root=settings.STATIC_ROOT)

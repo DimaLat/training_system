@@ -43,11 +43,8 @@ class Courses(models.Model):
     objects = models.Manager()
 
     def __str__(self):
-        return self.id
-        return self.course_name
-        return self.created_at
-        return self.updated_at
-        return "yoyoyoyoy"
+        course = str(self.id) +", " + str(self.course_name)+", " + str(self.created_at)+", " + str(self.updated_at)
+        return course
 
 
 class Subjects(models.Model):

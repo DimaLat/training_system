@@ -6,12 +6,17 @@ import requests
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.core.files.storage import FileSystemStorage
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render
 from django.urls import reverse
+from rest_framework.decorators import api_view
+from rest_framework import status, generics, mixins
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from student_management_app.EmailBackEnd import EmailBackEnd
-from student_management_app.models import CustomUser, Courses, SessionYearModel
+from student_management_app.models import CustomUser, Courses, SessionYearModel, Subjects, Staffs
+from student_management_app.serializers import CoursesSerializer, SubjectsSerializer, StaffsSerializer
 from student_management_system import settings
 
 
@@ -93,15 +98,9 @@ def showFirebaseJS(request):
     return HttpResponse(data, content_type="text/javascript")
 
 
-def Testurl(request):
-    courses = Courses.objects.all()
-
-
-    return HttpResponse("Ok", {"courses":courses})
-
 def Contacts(request):
+    return render(request, 'contacts.html')
 
-    return render(request,'contacts.html')
 
 def signup_admin(request):
     return render(request, "signup_admin_page.html")
@@ -178,6 +177,67 @@ def do_signup_student(request):
     user.save()
     messages.success(request, "Successfully Added Student")
     return HttpResponseRedirect(reverse("show_login"))
-    # except:
-    #   messages.error(request, "Failed to Add Student")
-    #  return HttpResponseRedirect(reverse("show_login"))
+
+
+class CoursesDetail(APIView):
+    """
+    Retrieve, update or delete a snippet instance.
+    """
+
+    def get_object(self, pk):
+        try:
+            return Courses.objects.get(pk=pk)
+        except Courses.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk, format=None):
+        courses = self.get_object(pk)
+        serializer = CoursesSerializer(courses)
+        return Response(serializer.data)
+
+    def put(self, request, pk, format=None):
+        courses = self.get_object(pk)
+        serializer = CoursesSerializer(courses, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        course = self.get_object(pk)
+        course.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class SubjectsDetail(mixins.RetrieveModelMixin,
+                     mixins.UpdateModelMixin,
+                     mixins.DestroyModelMixin,
+                     generics.GenericAPIView):
+    queryset = Subjects.objects.all()
+    serializer_class = SubjectsSerializer
+
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
+
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
+
+
+class StaffsDetail(mixins.RetrieveModelMixin,
+                   mixins.UpdateModelMixin,
+                   mixins.DestroyModelMixin,
+                   generics.GenericAPIView):
+    queryset = Staffs.objects.all()
+    serializer_class = StaffsSerializer
+
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
+
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
