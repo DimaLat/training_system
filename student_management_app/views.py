@@ -177,13 +177,33 @@ def do_signup_student(request):
     user.save()
     messages.success(request, "Successfully Added Student")
     return HttpResponseRedirect(reverse("show_login"))
+    # except:
+    #   messages.error(request, "Failed to Add Student")
+    #  return HttpResponseRedirect(reverse("show_login"))
+
+
+@api_view(['GET', 'POST', 'DELETE', 'PUT'])
+def courses_list(request):
+    """
+    List all code snippets, or create a new snippet.
+    """
+    if request.method == 'GET':
+        courses = Courses.objects.all()
+        serializer = CoursesSerializer(courses, many=True)
+        return Response(serializer.data)
+
+    elif request.method == 'POST':
+        serializer = CoursesSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CoursesDetail(APIView):
     """
     Retrieve, update or delete a snippet instance.
     """
-
     def get_object(self, pk):
         try:
             return Courses.objects.get(pk=pk)
@@ -210,9 +230,9 @@ class CoursesDetail(APIView):
 
 
 class SubjectsDetail(mixins.RetrieveModelMixin,
-                     mixins.UpdateModelMixin,
-                     mixins.DestroyModelMixin,
-                     generics.GenericAPIView):
+                    mixins.UpdateModelMixin,
+                    mixins.DestroyModelMixin,
+                    generics.GenericAPIView):
     queryset = Subjects.objects.all()
     serializer_class = SubjectsSerializer
 
@@ -225,11 +245,10 @@ class SubjectsDetail(mixins.RetrieveModelMixin,
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)
 
-
 class StaffsDetail(mixins.RetrieveModelMixin,
-                   mixins.UpdateModelMixin,
-                   mixins.DestroyModelMixin,
-                   generics.GenericAPIView):
+                    mixins.UpdateModelMixin,
+                    mixins.DestroyModelMixin,
+                    generics.GenericAPIView):
     queryset = Staffs.objects.all()
     serializer_class = StaffsSerializer
 
@@ -241,3 +260,6 @@ class StaffsDetail(mixins.RetrieveModelMixin,
 
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)
+
+
+
